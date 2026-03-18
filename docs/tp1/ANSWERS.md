@@ -14,3 +14,74 @@ _sentiment_raw seems to be a score to represent if the review is positive or neg
 
 6. In the clickstrem Parquet file, the `event_type` column contains the type of the click. In our database, all the raws have the same value _pageview_.  
 There are also internal columns such as _ga_client_id, _gtm_container_id, _dom_interactive_ms, _ttfb_ms, _connection_type, _js_heap_size_mb, _consent_string.
+
+## Step 2 — Extract the data 
+The data is then extracted from S3 aws and loaded into bronze_group3. 
+
+In order to verify that this step has been done successfully, we applied the following queries :
+
+```sql
+-- 1. How many tables in your bronze schema?
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'bronze_group3'
+ORDER BY table_name;
+```
+
+<img src=".\images\query_1.jpeg" alt="The result of the first query" width="50%" />
+
+As we can see there are 6 tables in total that have been loaded.
+
+```sql
+-- Row counts per table
+SELECT 'products' AS table_name, COUNT(*) AS rows FROM bronze_group3.products
+UNION ALL
+SELECT 'users', COUNT(*) FROM bronze_group3.users
+UNION ALL
+SELECT 'orders', COUNT(*) FROM bronze_group3.orders
+UNION ALL
+SELECT 'order_line_items', COUNT(*) FROM bronze_group3.order_line_items
+UNION ALL
+SELECT 'reviews', COUNT(*) FROM bronze_group3.reviews
+UNION ALL
+SELECT 'clickstream', COUNT(*) FROM bronze_group3.clickstream;
+```
+
+
+<img src=".\images\query_2.jpeg" alt="The result of the second query" width="50%" />
+
+```sql
+-- Inspect the columns of the products table — notice the _ prefixed columns
+SELECT column_name
+FROM information_schema.columns
+WHERE table_schema = 'bronze_group3' AND table_name = 'products'
+ORDER BY ordinal_position;
+```
+<img src=".\images\query_3.jpeg" alt="The result of the third query" width="50%" />
+
+```sql
+-- Quick peek at order statuses
+SELECT status, COUNT(*) AS cnt
+FROM bronze_group3.orders
+GROUP BY status
+ORDER BY cnt DESC;
+```
+<img src=".\images\query_4.jpeg" alt="The result of the fourth query" width="50%" />
+
+```sql
+-- Check reviews — what ratings exist?
+SELECT rating, COUNT(*) AS cnt
+FROM bronze_group3.reviews
+GROUP BY rating
+ORDER BY rating;
+```
+<img src=".\images\query_5.jpeg" alt="The result of the sixth query" width="50%" />
+
+```sql
+-- Check clickstream — what event types exist?
+SELECT event_type, COUNT(*) AS cnt
+FROM bronze_group3.clickstream
+GROUP BY event_type
+ORDER BY cnt DESC;
+```
+<img src=".\images\query_6.jpeg" alt="The result of the last query" width="50%" />
