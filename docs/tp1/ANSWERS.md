@@ -75,7 +75,7 @@ FROM bronze_group3.reviews
 GROUP BY rating
 ORDER BY rating;
 ```
-<img src=".\images\query_5.jpeg" alt="The result of the sixth query" width="50%" />
+<img src=".\images\query_5.jpeg" alt="The result of the fifth query" width="50%" />
 
 ```sql
 -- Check clickstream — what event types exist?
