@@ -41,7 +41,14 @@ def get_engine():
     # TODO: Build the PostgreSQL connection URL and create the engine
     # Hint: use create_engine() from SQLAlchemy
     # The URL must follow this format: postgresql://{user}:{password}@{host}:{port}/{database}
-    raise NotImplementedError("TODO: Implement get_engine()")
+    try:
+        url = f"postgresql://{RDS_USER}:{RDS_PASSWORD}@{RDS_HOST}:{RDS_PORT}/{RDS_DATABASE}"
+        engine = create_engine(url)
+        return engine
+    except Exception as e:
+        print(f"Error creating engine: {e}")
+        raise
+    # raise NotImplementedError("TODO: Implement get_engine()")
 
 
 def test_connection():
@@ -55,7 +62,15 @@ def test_connection():
     # TODO: Use get_engine() to connect and execute SELECT 1
     # Hint: use engine.connect() inside a with block
     #       then connection.execute(text("SELECT 1"))
-    raise NotImplementedError("TODO: Implement test_connection()")
+    try:
+        engine = get_engine()
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT 1"))
+            return result.scalar() == 1
+    except Exception as e:
+        print(f"Connection test failed: {e}")
+        return False
+    # raise NotImplementedError("TODO: Implement test_connection()")
 
 
 def execute_sql(sql: str, params: dict = None):
